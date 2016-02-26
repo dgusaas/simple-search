@@ -121,11 +121,39 @@
           (recur new-answer (inc num-tries))
           (recur current-best (inc num-tries)))))))
 
-; (time (random-search score knapPI_16_200_1000_1 100000
-; ))
+;; (time (random-search score knapPI_16_200_1000_1 100000
+;; ))
 
-; (time (hill-climber mutate-answer score knapPI_16_200_1000_1 100000
-; ))
+;; (time (hill-climber mutate-answer score knapPI_16_200_1000_1 100000
+;; ))
 
-; (time (hill-climber mutate-answer penalized-score knapPI_16_200_1000_1 100000
-; ))
+;; (time (hill-climber mutate-answer penalized-score knapPI_16_200_1000_1 100000
+;; ))
+
+(defn uniform-crossover-search
+  ""
+  [instance max-tries]
+  )
+
+(defn uniform-crossover
+  ""
+  [population]
+
+  )
+
+(defn randomly-select
+  ""
+  [parent1 parent2]
+  (map #() parent1 parent2)
+  )
+
+(defn tournament-selection
+  ""
+  [population size]
+  (take size (find-best (random-sample (/ size (count population)) population))))
+
+(defn find-best
+  "Sorts the population by fitness."
+  [population]
+  (let [return (sort-by :score > population)]
+  return))
