@@ -130,26 +130,33 @@
 ;; (time (hill-climber mutate-answer penalized-score knapPI_16_200_1000_1 100000
 ;; ))
 
-(defn uniform-crossover-search
+(defn crossover-search
   ""
-  [instance max-tries]
-  )
+  [instance max-tries size mutator]
+  (let [population (map :choices (take size (repeatedly #(random-answer instance))))]
+  (find-best (map #(add-score penalized-score %) (map (partial make-answer instance) (last (take max-tries (iterate (partial spawn-generation instance size mutator) population))))))))
 
-(defn uniform-crossover
-  ""
-  [population]
+(defn spawn-generation
+  "Creates a mew generation based of the best of the last generation and returns the choices of the best"
+  [instance size mutator population]
+  (let [best (tournament-selection (/ size 2) (map #(add-score penalized-score %) (map (partial make-answer instance) (crossover population size mutator))))]
+    (println (:score (first best)))
+    (map :choices best)))
 
-  )
+(defn crossover
+  "Takes in a population and returns a new population by randomly crossover parents"
+  [population size mutator]
+  (take size (apply concat (take size (repeatedly #(vals (mutator (nth population (rand-int (count population))) (nth population (rand-int (count population))))))))))
 
-(defn randomly-select
-  ""
+(defn uniform-mutation
+  "Takes two parents and returns two children that are the crossovers of the parents."
   [parent1 parent2]
-  (map #() parent1 parent2)
-  )
+  (let [flips (take (count parent1) (repeatedly (count parent1) #(rand-int 10)))]
+  {:child1 (map #(if (= %3 0) %2 %1) parent1 parent2 flips) :child2 (map #(if (= %3 0) %1 %2) parent1 parent2 flips)}))
 
 (defn tournament-selection
-  ""
-  [population size]
+  "Take the best of a randomly chosen group of individuals."
+  [size population]
   (take size (find-best (random-sample (/ size (count population)) population))))
 
 (defn find-best
@@ -157,3 +164,6 @@
   [population]
   (let [return (sort-by :score > population)]
   return))
+
+(map :score (crossover-search knapPI_16_20_1000_1 10 20 uniform-mutation
+      ))
