@@ -8,12 +8,12 @@
         simple-search.knapsack-examples.knapPI_16_200_1000))
 
 (defn run-experiment
-  [searchers problems num-replications max-evals]
+  [searchers problems num-replications max-evals size]
   (println "Search_method Problem Max_evals Run Score")
   (for [searcher searchers
         p problems
         n (range num-replications)]
-    (let [answer (future (searcher p max-evals))]
+    (let [answer (future (searcher p max-evals size))]
       {:searcher searcher
        :problem p
        :max-evals max-evals
@@ -52,24 +52,25 @@
   where you replace 30 and 1000 with the desired number of repetitions
   and maximum answers.
   "
-  [num-repetitions max-answers]
+  [num-repetitions max-answers size]
   ; This is necessary to "move" us into this namespace. Otherwise we'll
   ; be in the "user" namespace, and the references to the problems won't
   ; resolve propertly.
   (ns simple-search.experiment)
   (print-experimental-results
    (run-experiment [(with-meta
-                      (partial core/hill-climber core/mutate-answer core/score)
+                      (partial core/crossover-search core/two-point-crossover)
                       {:label "hill_climber_cliff_score"})
                     (with-meta
-                      (partial core/hill-climber core/mutate-answer core/penalized-score)
+                      (partial core/crossover-search core/uniform-crossover)
                       {:label "hill_climber_penalized_score"})
-                    (with-meta (partial core/random-search core/score)
+                    (with-meta (partial core/hill-climber core/mutate-answer core/penalized-score)
                       {:label "random_search"})]
                    (map get-labelled-problem
                         ["knapPI_11_20_1000_4" "knapPI_13_20_1000_4" "knapPI_16_20_1000_4"
-                         "knapPI_11_200_1000_4" "knapPI_13_200_1000_4" "knapPI_16_200_1000_4"])
+                         "knapPI_11_200_1000_4" "knapPI_13_200_1000_4" "knapPI_16_200_1000_4" "knapPI_16_1000_1000_3"])
                    (Integer/parseInt num-repetitions)
-                   (Integer/parseInt max-answers)))
+                   (Integer/parseInt max-answers)
+                   (Integer/parseInt size)))
   (shutdown-agents))
 

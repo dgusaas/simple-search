@@ -110,7 +110,7 @@
 ; (mutate-answer ra)
 
 (defn hill-climber
-  [mutator scorer instance max-tries]
+  [mutator scorer instance max-tries size]
   (loop [current-best (add-score scorer (random-answer instance))
          num-tries 1]
     (let [new-answer (add-score scorer (mutator current-best))]
@@ -132,17 +132,17 @@
 
 (defn crossover-search
   ""
-  [instance max-tries size mutator]
+  [mutator instance max-tries size]
   (let [population (map :choices (take size (repeatedly #(random-answer instance))))]
   (find-best (map #(add-score penalized-score %) (map (partial make-answer instance) (last (take max-tries (iterate (partial spawn-generation instance size mutator) population))))))))
 
 (defn spawn-generation
   "Creates a mew generation based of the best of the last generation and returns the choices of the best"
   [instance size mutator population]
-  (let [all (map #(add-score penalized-score %) (map (partial make-answer instance) (crossover population size mutator)))
+  (let [all (concat (map #(add-score penalized-score %) (map (partial make-answer instance) (crossover population size mutator))) (map #(add-score penalized-score %) (map (partial make-answer instance) population)))
 
-        best (tournament-selection 10 all)]
-    ;(println (map :score all))
+        best (tournament-selection 4 all)]
+
     (map :choices best)))
 
 (defn crossover
@@ -150,13 +150,12 @@
   [population size mutator]
   (take size (apply concat (take size (repeatedly #(vals (mutator (rand-nth population) (rand-nth population))))))))
 
-(defn uniform-mutation
+(defn uniform-crossover
   "Takes two parents and returns two children that are the crossovers of the parents."
   [parent1 parent2]
   (let [flips (take (count parent1) (repeatedly (count parent1) #(rand-int 5)))]
-    (println "Parent1: " parent1)
-    (println "Parent2: " parent2)
-  {:child1 (map #(if (= %3 0) %2 %1) parent1 parent2 flips) :child2 (map #(if (= %3 0) %1 %2) parent1 parent2 flips)}))
+  {:child1 (mutate-choices (map #(if (= %3 0) %2 %1) parent1 parent2 flips)) :child2 (mutate-choices (map #(if (= %3 0) %1 %2) parent1 parent2 flips))}))
+
 
 (defn two-point-crossover
   "Picks two points and switches all the values of the parents between those points "
@@ -166,17 +165,13 @@
         left (if (<= point1 point2) point1 point2)
         right (if (>= point1 point2) point1 point2)
         ]
-    {:child1 (concat (subvec (vec parent1) 0 left) (subvec (vec parent2) left right) (subvec (vec parent1) right (count (vec parent1))))
-     :child2 (concat (subvec (vec parent2) 0 left) (subvec (vec parent1) left right) (subvec (vec parent2) right (count (vec parent2))))}))
-
-
-
-(two-point-crossover [0 0 0 0 0 0 0 0] [1 1 1 1 1 1 1 1])
+    {:child1 (mutate-choices (concat (subvec (vec parent1) 0 left) (subvec (vec parent2) left right) (subvec (vec parent1) right (count (vec parent1)))))
+     :child2 (mutate-choices (concat (subvec (vec parent2) 0 left) (subvec (vec parent1) left right) (subvec (vec parent2) right (count (vec parent2)))))}))
 
 (defn tournament-selection
   "Take the best of a randomly chosen group of individuals."
   [size population]
-  (take size (find-best population)))
+  (take size (repeatedly (fn blah[] (first (find-best (take 4 (repeatedly #(rand-nth population)))))))))
 
 (defn find-best
   "Sorts the population by fitness."
@@ -184,4 +179,4 @@
   (let [return (sort-by :score > population)]
   return))
 
-(map :score (crossover-search knapPI_16_20_1000_1 50 20 two-point-crossover))
+(map :score (crossover-search knapPI_16_20_1000_1 100 200 uniform-crossover))
