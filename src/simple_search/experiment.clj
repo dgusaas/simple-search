@@ -61,12 +61,12 @@
   (print-experimental-results
    (run-experiment [(with-meta
                       (partial core/crossover-search core/two-point-crossover)
-                      {:label "hill_climber_cliff_score"})
+                      {:label "core/two-point-crossover"})
                     (with-meta
                       (partial core/crossover-search core/uniform-crossover)
-                      {:label "hill_climber_penalized_score"})
+                      {:label "uniform-crossover"})
                     (with-meta (partial core/hill-climber core/mutate-answer core/penalized-score)
-                      {:label "random_search"})]
+                      {:label "hill-climber"})]
                    (map get-labelled-problem
                         ["knapPI_11_20_1000_4" "knapPI_13_20_1000_4" "knapPI_16_20_1000_4"
                          "knapPI_11_200_1000_4" "knapPI_13_200_1000_4" "knapPI_16_200_1000_4" "knapPI_16_1000_1000_3"])
