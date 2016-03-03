@@ -178,4 +178,4 @@
   (find-best (map #(add-score penalized-score %) (map (partial make-answer instance) (last (take max-tries (iterate (partial spawn-generation instance size mutator) population))))))))
 
 
-;(map :score (crossover-search uniform-crossover knapPI_16_20_1000_1 100 200))
+(map :score (crossover-search uniform-crossover knapPI_16_20_1000_1 100 200))

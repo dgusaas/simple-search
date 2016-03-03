@@ -5,7 +5,8 @@
         simple-search.knapsack-examples.knapPI_16_20_1000
         simple-search.knapsack-examples.knapPI_11_200_1000
         simple-search.knapsack-examples.knapPI_13_200_1000
-        simple-search.knapsack-examples.knapPI_16_200_1000))
+        simple-search.knapsack-examples.knapPI_16_200_1000
+        simple-search.knapsack-examples.knapPI_16_1000_1000))
 
 (defn run-experiment
   [searchers problems num-replications max-evals size]
@@ -74,3 +75,4 @@
                    (Integer/parseInt size)))
   (shutdown-agents))
 
+(-main "1" "10" "10")
