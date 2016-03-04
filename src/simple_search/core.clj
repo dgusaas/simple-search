@@ -138,7 +138,7 @@
 (defn tournament-selection
   "Take the best of a randomly chosen group of individuals."
   [size population]
-  (take size (repeatedly (fn blah[] (first (find-best (take 4 (repeatedly #(rand-nth population)))))))))
+  (take size (repeatedly (fn pickBest[] (first (find-best (take 4 (repeatedly #(rand-nth population)))))))))
 
 (defn two-point-crossover
   "Picks two points and switches all the values of the parents between those points "
@@ -178,4 +178,4 @@
   (first (find-best (map #(add-score penalized-score %) (map (partial make-answer instance) (last (take max-tries (iterate (partial spawn-generation instance size mutator) population)))))))))
 
 
-(crossover-search uniform-crossover knapPI_16_20_1000_1 100 200)
+;(crossover-search uniform-crossover knapPI_16_20_1000_1 1000 100)

@@ -74,5 +74,3 @@
                    (Integer/parseInt max-answers)
                    (Integer/parseInt size)))
   (shutdown-agents))
-
-(-main "1" "10" "10")

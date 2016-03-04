@@ -1,0 +1,61 @@
+---
+title: "Knapsack experiments"
+author: "Brennan Gensch, Dalton Gusaas, Henry Megarry"
+date: "March 3, 2016"
+output: pdf_document
+---
+
+# Introduction
+
+We have two different methods for population based search. Both methods implement tournament selection. The selection is run four times, each time it picks four random parents and takes the best of that tournament. There are two crossover funtions that we have implemented; the functions are two-point crossover and uniform crossover. Each crossover function takes two parents and generates two children, the children are then mutated by flipping one bit. We have a thousand generations with a population size of one hundred. 
+
+```{r}
+data_1000_100 <- read.csv("test.txt", sep="")
+data_1000_100$Non_negative_score = ifelse(data_1000_100$Score<0, 0, data_1000_100$Score)
+
+```
+
+```{r}
+library("ggplot2")
+ggplot(data_1000_100, 
+       aes(x=factor(Max_evals), y=Score, group=Max_evals)) + 
+  geom_boxplot() + facet_grid(Search_method ~ Problem)
+
+pairwise.wilcox.test(data_1000_100$Non_negative_score, data_1000_100$Search_method)
+```
+
+
+```{r, echo=FALSE}
+library("ggplot2")
+
+twenty_item_problems = subset(data_1000_100, (Problem=="knapPI_11_20_1000_4")  | (Problem=="knapPI_13_20_1000_4") | (Problem=="knapPI_16_20_1000_4"))
+
+ggplot(twenty_item_problems, aes(Search_method, Non_negative_score)) + geom_boxplot() + facet_grid(. ~ Problem)
+```
+
+```{r, echo=FALSE}
+library("ggplot2")
+
+two_hundren_item_problems = subset(data_1000_100, (Problem=="knapPI_11_200_1000_4")  | (Problem=="knapPI_13_200_1000_4") | (Problem=="knapPI_16_200_1000_4"))
+
+ggplot(two_hundren_item_problems, aes(Search_method, Non_negative_score)) + geom_boxplot() + facet_grid(. ~ Problem)
+```
+
+```{r, echo=FALSE}
+library("ggplot2")
+
+thousand_item_problems = subset(data_1000_100, (Problem=="knapPI_16_1000_1000_3"))
+
+ggplot(thousand_item_problems, aes(Search_method, Non_negative_score)) + geom_boxplot() + facet_grid(. ~ Problem)
+```
+
+# Interesting results
+
+In the following graphs you can see the on the lower number the hill climber and the genetic algorithms performed similarly. The hill climber however had a much larger range. On the harder data sets the genetic algorithms performed much better than the hill climber.
+
+# Conclusion
+Something that we would change if we had time to rerun our experiments would be to use either lower population sizes and higher generations or invert our original distribution to 100 generations and 1000 individuals. With the latter, it would be interesting to see if our uniform crossover would be able to get the same results as Mark and Jacob's group as well as Emma and Lemmon's group. 
+
+When initially writing our uniform-crossover and two-point-crossover, we did not include a mutation method so our results were supremely sub-optimal (the populations prematurely converged at about five generations). We then added in a simple bit-flipping mutation which adds in a bit of randomness, thus stopping the premature convergence. It would be interesting to know how big of an impact that the mutator has on the growth of a population. This would be something else that we could mess with to perhaps better improve our results.
+
+Our genetic algorithms generally out-performed the hill climber, especially on the larger data and more difficult data sets.
